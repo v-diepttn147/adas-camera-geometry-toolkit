@@ -1,4 +1,4 @@
-# Visual Navigation
+# 3D Geometric Basics
 
 ## Coordinate Frames
 
@@ -169,6 +169,150 @@ T_c^W = T_c^WT_c^r
 T_W^r = (T_r^W)^{-1} = \begin{bmatrix} (R_r^W)^T & -(R_r^W)^Tt_r^W \\ 0_3^T & 1 \end{bmatrix}
 ```
 
+# Lie Groups and Distances
+
+## Groups and Lie Groups
+
+A group $G$ is a set of elements together with a binary group operation $\otimes$ that satisfies the following conditions:
+
+- closure: for any $A, B \in G$, it holds $A \otimes B \in G$
+- associativity: for any $A, B, C \in G$, it holds $(A \otimes B) \otimes C = A \otimes (B \otimes C)$
+- identity element: there exists an identity element $i \in G$ such that $A \otimes I = I \otimes A = A$ for any $A \in G$
+- inverse: for any $A \in G$ there exist an inverse element $A^{-1}$ such that $A \otimes A^{-1} = A^{-1} \otimes A = I$
+
+E.g.
+
+- **General Linear Group** (GL$(d, \mathbb{R})$). Set of invertible $\mathbb{R}^{d \times d}$ matrix with matrix multiplication as group operation.
+- **Orthogonal Group** ($O(d)$). Group of orthogonal matrices.
+- **Special Orthogonal Group** ($SO(d)$). Group of rotation matrices, which is the subset of $d \times d$ matrices defined as $SO(d) \dot{=} \{R \in \mathbb{R}^{d×d} : R^TR = I_d, det(R) = +1 \}$. This is sometimes called the group of proper rotations.
+- **Special Euclidean Group** ($SE(d)$). The group of $(d+1) \times (d+1)$ matrices representing rigid transformations.
+
+## Lie algebras
+
+Every matrix Lie group is associated a *Lie algebra*, which consists of a vector space, called *tangent space*, and a binary operation called the *Lie Bracket*.
+
+E.g.
+
+- Lie algebra of SO(3). The vector space corresponding to the Lie algrbra of SO(3) is
+
+```math
+SO(3) = \left\{
+    \begin{bmatrix} 
+    0 & -\phi_3 & \phi_2 \\
+    \phi_3 & 0 & -\phi_1 \\
+    -\phi_2 & \phi_1 & 0
+    \end{bmatrix} 
+    : \phi = \begin{bmatrix} \phi_1 & \phi_2 & \phi_3 \end{bmatrix} ^T \in \mathbb{R}^3
+    \right\}
+```
+with corresponds to the set of skew-symmetric matrix in $\mathbb{R}^{3 \times 3}$. For notational convenience, we define the hat $(\cdot)^{\wedge}$ and the vee $(\cdot)^{\vee}$ operators as follows:
+
+```math
+(\phi)^{\wedge} \dot{=}
+    \begin{bmatrix}
+    0 & -\phi_3 & \phi_2 \\
+    \phi_3 & 0 & -\phi_1 \\
+    -\phi_2 & \phi_1 & 0
+    \end{bmatrix}
+    and 
+    \begin{bmatrix}
+    0 & -\phi_3 & \phi_2 \\
+    \phi_3 & 0 & -\phi_1 \\
+    -\phi_2 & \phi_1 & 0
+    \end{bmatrix}^{\vee} \dot{=} \phi
+```
+
+- Lie algebra of SE(3). The vector space corresponding to the Lie algebra of SE(3) is:
+
+```math
+SE(3) = \left\{ 
+    \begin{bmatrix}
+    \phi^{\wedge} & \rho \\
+    O_3^T & 0
+    \end{bmatrix}
+    : \rho, \phi \in \mathbb{R}^3
+\right\}
+```
+
+For notational convenience, we overload the hat $(\cdot)^{\wedge}$ and the vee $(\cdot)^{\vee}$ operators to work on vectors $E \in \mathbb{R}^6$ as vectors:
+
+```math
+E^{\wedge} = \begin{bmatrix} \phi \\ \rho \end{bmatrix}^{\wedge} \dot{=} \begin{bmatrix} \phi^{\wedge} & \rho \\ O_3^T & 0 \end{bmatrix} and \begin{bmatrix} \phi^{\wedge} & \rho \\ O_3^T & 0 \end{bmatrix}^{\vee} \dot{=} E = \begin{bmatrix} \phi \\ \rho \end{bmatrix}
+```
+
+## Exponential and Logarithm map
+
+The *exponential map* and the *logarithm map* relate elements of a matrix Lie group with elements in the corresponding Lie algebra. In particular, the *exponential map* produces a matrix Lie group element $G$ from a Lie algebra element $A \dot{=} a^{\wedge}$ via matrix exponential:
+
+```math
+G = exp(A) = \sum^{\infty}_{n=1}{\frac{(-1)^{n-1}}{n}(G - I)^n}
+```
+
+- Exponential and Logarithm maps for SO(3). Any element of SO(3) is a $3 \times 3$ skew symmetric matrix, and this allows simplifying the expression of the exponential map for SO(3), which can be written in closed-form as follows:
+
+```math
+R = exp(\phi^{\wedge}) = cos(||\phi||)I_3 + sin(||\phi||)\left[ \frac{\phi}{||\phi||} \right]_{\times} + (1-cos(||\phi||))\left( \frac{\phi}{||\phi||} \right)\left( \frac{\phi}{||\phi||} \right)^T
+```
+
+Now we observe that the expression above resembles the Rodrigue's rotation formula.
+
+- Exponential and Logarithm maps for SE(3). Using the special structure of the $4 \times 4$ skew matrix in SE(3), we can simplify the expression of exponential map for SE(3), which can be written in closed-form as follows:
+
+```math
+E^{\wedge} = \begin{bmatrix} \phi \\ \rho \end{bmatrix}^{wedge} = log\left(\begin{bmatrix} R & t \\ O_3^T & 1 \end{bmatrix}\right) = \begin{bmatrix} \phi \\ J_l^{-1} (\phi)t \end{bmatrix}^{\wedge}
+```
+
+where $\phi = log(R)^{\vee}$. The inverse of the left Jacobian can be expressed in closed form as:
+
+```math
+J_l^{-1} (\phi) \dot{=} I_3 - \frac{1}{2}\phi^{\wedge} + \left( \frac{1}{||\phi||^2} - \frac{1 + cos(||\phi||)}{2||\phi||sin(||\phi||)} \right) \phi^{\wedge}\phi^{\wedge}
+```
+
+## Distances
+
+### Distances between rotations
+
+#### Angular (or geodesic) distance in SO(3)
+
+An intuitive metric for the distance between two rotations $R_A$ and ${R_B}$ in SO(3) can be obtained by (i) computing the relative rotation $R_{AB} = R_A^TR_B$ and (ii) computing the rotation angle $\theta_{AB}$ of the rotation, (iii) taking the absolute value of the rotation angle.
+
+```math
+dist_\theta(R_A, R_B) = \left| arccos \left( \frac{tr(R_Z^TR_B) - 1}{2} \right) \right|
+```
+
+or it can also be written as
+
+```math
+dist_\theta(R_A, R_B) = ||log(R_A^TR_B)^{\vee}|| = ||log(R_B^TR_A)^{\vee}
+```
+
+Bi-invariance: for 3 rotations
+
+```math
+dist_\theta(R_A, R_B) = dist_\theta(R_CR_A, R_CR_B) = dist_\theta(R_AR_C, R_BR_C)
+```
+
+#### Chordal distance in SO(3)
+
+```math
+dist_c(R_x, R_B) = ||R_A - R_B||_F = ||R_B-R_A||_F
+```
+
+where $|| \cdot ||_F$ is the Frobenius norm
+
+```math
+||M||_F = \sqrt{\sum_{ij}M_{ij}^2} = \sqrt{tr(MM^T)}
+```
+
+![angular_vs_chrodal_dist](../images/angular_vs_chrodal_dist.png)
+
+#### Quaternion distance
+
+```math
+dist_q(q_A, q_B) = ||q_A - q_b|| = ||q_B - q_A||
+```
+
 # References
 
 - Massachusetts Institute of Technology. (2020). MIT 16.485 Visual Navigation for Autonomous Vehicles—LecNotes02/03 [Lecture notes]. MIT OpenCourseWare. https://ocw.mit.edu/courses/16-485-visual-navigation-for-autonomous-vehicles-vnav-fall-2020/resources/mit16_485f20_lec02and03/
+- Massachusetts Institute of Technology. (2020). MIT 16.485 Visual Navigation for Autonomous Vehicles—LecNotes04/05 [Lecture notes]. MIT OpenCourseWare. https://ocw.mit.edu/courses/16-485-visual-navigation-for-autonomous-vehicles-vnav-fall-2020/pages/lecture-notes/
