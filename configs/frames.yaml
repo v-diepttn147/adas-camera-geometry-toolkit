@@ -1,0 +1,24 @@
+frames:
+  vehicle:
+    description: "Vehicle/base frame"
+    axes:
+      x: "forward"
+      y: "left"
+      z: "up"
+
+  camera_optical:
+    description: "Camera optical frame"
+    axes:
+      x: "right"
+      y: "down"
+      z: "forward"
+
+  image:
+    description: "Image pixel frame"
+    axes:
+      u: "right"
+      v: "down"
+
+convention:
+  transform_notation: "T_ab transforms points from frame b to frame a"
+  equation: "p_a = T_ab @ p_b"

@@ -41,11 +41,11 @@ The learning sequence is:
 
 The `docs/` folder contains the theory notes that guide the implementation work.
 
-| Topic | Note | Status |
-| --- | --- | --- |
+| Topic                    | Note                                                   | Status      |
+| ------------------------ | ------------------------------------------------------ | ----------- |
 | Visual navigation basics | [docs/visual_navigation.md](docs/visual_navigation.md) | In progress |
-| Camera projection model | [docs/camera_models.md](docs/camera_models.md) | In progress |
-| Calibration fundamentals | Planned | Upcoming |
+| Camera projection model  | [docs/camera_models.md](docs/camera_models.md)         | In progress |
+| Calibration fundamentals | Planned                                                | Upcoming    |
 
 ## Planned Implementation
 
@@ -100,6 +100,30 @@ robotics engineering work:
 - [ ] Add calibration examples with synthetic data
 - [ ] Add unit tests and numerical validation
 - [ ] Build small ADAS-style demos such as lane-frame projection or bird's-eye view mapping
+
+## Convention
+
+```bash
+vehicle frame:
+    x forward
+    y left
+    z up
+
+camera optical frame:
+    x right
+    y down
+    z forward
+
+image frame
+    u right
+    v down
+```
+
+### How to run
+
+```bash
+pytest tests/test_transforms.py -v
+```
 
 ## References
 
